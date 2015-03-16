@@ -1,0 +1,13 @@
+---
+- name: create tmp directory to build docker image
+  file: path=/tmp/ircd state=directory
+
+- name: copy the config accross
+  copy: dest=/tmp/ircd/ircd.conf src=ircd.conf
+
+- name: copy the Dockerfile across
+  copy: dest=/tmp/ircd/Dockerfile src=Dockerfile
+
+- name: build the docker container
+  docker_image: name='sw00/ircd' path=/tmp/ircd state=build
+  notify: restart ircd
