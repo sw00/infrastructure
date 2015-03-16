@@ -1,0 +1,4 @@
+---
+- name: check out docker-owncloud repository
+  git: repo='git@github.com:sw00/docker-owncloud.git'
+       dest='/home/sett/docker-owncloud'
