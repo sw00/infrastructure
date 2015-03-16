@@ -1,0 +1,4 @@
+hosts     filter=cryp diff=crypt
+*.crt     filter=crypt diff=crypt
+*.key     filter=crypt diff=crypt
+*id_rsa   filter=crypt diff=crypt
