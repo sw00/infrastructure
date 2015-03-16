@@ -1,0 +1,7 @@
+- hosts: leek
+  roles: 
+  - base
+  - nginx
+- hosts: radish
+  roles:
+  - base
