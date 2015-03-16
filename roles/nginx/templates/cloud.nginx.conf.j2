@@ -23,4 +23,14 @@ server {
                 add_header Front-End-Https on;
                 #include /etc/nginx/proxy_params;
         }
+
+        location = /robots.txt {
+                deny all;
+                log_not_found off;
+                access_log off;
+        }
+
+        location ~ ^/(?:\.htaccess|data|config|db_structure\.xml|README){
+                deny all;
+        }
 }
