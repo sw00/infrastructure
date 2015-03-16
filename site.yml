@@ -1,12 +1,13 @@
 - hosts: leek
   sudo: yes
   roles:
-  - base
-  - docker
-  - nginx
-  - owncloud
+  - {role: base, tags: ['base']}
+  - {role: docker, tags: ['docker']}
+  - {role: nginx, tags: ['nginx']}
+  - {role: owncloud, tags: ['owncloud']}
+  - {role: ircd, tags: ['ircd']}
 
 - hosts: radish
   sudo: yes
   roles:
-  - base
+  - {role: base, tags: ['base']}
