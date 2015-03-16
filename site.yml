@@ -1,7 +1,9 @@
 - hosts: leek
-  roles: 
+  sudo: yes
+  roles:
   - base
   - nginx
 - hosts: radish
+  sudo: yes
   roles:
   - base
