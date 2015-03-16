@@ -1,3 +1,7 @@
 ---
 ssl_dir: '/etc/ssl/private'
-cloud_port: '9000'
+apps:
+  owncloud:
+    port: '9000'
+  ircd:
+    port: '6667'
