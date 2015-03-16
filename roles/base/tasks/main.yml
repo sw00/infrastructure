@@ -14,7 +14,7 @@
 - name: install pip
   apt: name=python-pip state=present
 
-- name: install docker
+- name: install docker-py
   pip: name=docker-py state=present
 
 - name: install docker-compose

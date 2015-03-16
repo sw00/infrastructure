@@ -2,6 +2,7 @@
   sudo: yes
   roles:
   - base
+  - docker
   - nginx
   - owncloud
 
