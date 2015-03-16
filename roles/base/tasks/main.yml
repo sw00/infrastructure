@@ -3,7 +3,10 @@
   apt: update_cache=yes
 
 - name: ensure user account exists
-  user: name=sett groups='sudo' append=yes shell=/bin/bash state=present
+  user: name=sett groups='sudo' append=yes shell=/bin/bash generate_ssh_key=yes state=present
+
+- name: add authorized key
+  authorized_key: user=sett key="{{ lookup('file', '/home/sett/.ssh/id_rsa.pub') }}"
 
 - name: install python
   apt: name=python state=present
