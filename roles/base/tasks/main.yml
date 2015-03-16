@@ -3,7 +3,7 @@
   apt: update_cache=yes
 
 - name: ensure user account exists
-  user: name=sett groups='sudo' apppend=yes shell=/bin/bash state=present
+  user: name=sett groups='sudo' append=yes shell=/bin/bash state=present
 
 - name: install python
   apt: name=python state=present
@@ -12,7 +12,7 @@
   apt: name=python-pip state=present
 
 - name: install docker
-  pip: name=docker state=present
+  pip: name=docker-py state=present
 
 - name: install docker-compose
   pip: name=docker-compose state=present

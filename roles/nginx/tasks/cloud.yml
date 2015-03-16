@@ -10,4 +10,4 @@
 
 - name: enable the vhost
   file: path='/etc/nginx/sites-enabled/cloud.rigmarolesoup.com' 
-        src=/etc/sites-available/cloude.rigmarolesoup.com' state=link
+        src='/etc/nginx/sites-available/cloud.rigmarolesoup.com' state=link
