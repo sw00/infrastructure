@@ -1,4 +1,12 @@
 ---
 - name: check out docker-owncloud repository
-  git: repo='git@github.com:sw00/docker-owncloud.git'
+  git: repo='git@github.com:sw00/docker-owncloud' accept_hostkey=yes
        dest='/home/sett/docker-owncloud'
+  sudo: no
+
+- name: build the image
+  docker_image: name='sw00/owncloud' path=/home/sett/docker-owncloud state=build
+
+- name: run the container
+  docker: name=owncloud image='sw00/owncloud' ports='127.0.0.1:9000:80'
+          volumes='/var/data/owncloud:/var/www/owncloud/data' state=running

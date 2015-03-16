@@ -3,6 +3,8 @@
   roles:
   - base
   - nginx
+  - owncloud
+
 - hosts: radish
   sudo: yes
   roles:
