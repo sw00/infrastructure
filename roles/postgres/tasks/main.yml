@@ -1,0 +1,9 @@
+---
+- name: ensure official image exists
+  docker:
+    image: postgres
+    name: postgresdb
+    state: running
+    env:
+      POSTGRES_USER: docker
+      POSTGRES_PASS: docker

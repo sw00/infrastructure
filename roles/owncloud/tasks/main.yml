@@ -9,4 +9,4 @@
 
 - name: run the container
   docker: name=owncloud image='sw00/owncloud' ports='127.0.0.1:9000:80'
-          volumes='/var/data/owncloud:/var/www/owncloud/data' state=running
+          volumes_from=data state=running

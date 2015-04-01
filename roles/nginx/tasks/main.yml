@@ -5,3 +5,7 @@
 - name: configure cloud.rigmaorlesoup.com
   include: cloud.yml
   notify: restart nginx
+
+- name: configure reader.rigmaorlesoup.com
+  include: reader.yml
+  notify: restart nginx

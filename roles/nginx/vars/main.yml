@@ -5,3 +5,5 @@ apps:
     port: '9000'
   ircd:
     port: '6667'
+  reader:
+    port: '9001'

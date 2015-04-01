@@ -3,9 +3,11 @@
   roles:
   - {role: base, tags: ['base']}
   - {role: docker, tags: ['docker']}
-  - {role: nginx, tags: ['nginx']}
+  - {role: postgres, tags: ['postgres']}
   - {role: owncloud, tags: ['owncloud']}
   - {role: ircd, tags: ['ircd']}
+  - {role: tinyrss, tags: ['tinyrss']}
+  - {role: nginx, tags: ['nginx']}
 
 - hosts: radish
   sudo: yes
