@@ -6,6 +6,7 @@
   - {role: postgres, tags: ['postgres']}
   - {role: owncloud, tags: ['owncloud']}
   - {role: ircd, tags: ['ircd']}
+  - {role: znc, tags: ['znc']}
   - {role: tinyrss, tags: ['tinyrss']}
   - {role: nginx, tags: ['nginx']}
 
