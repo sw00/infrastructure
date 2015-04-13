@@ -12,6 +12,8 @@ server {
         ssl_certificate {{ssl_dir}}/rigmarolesoup.com.crt;
         ssl_certificate_key {{ssl_dir}}/rigmarolesoup.com.key;
 
+	client_max_body_size 1024m;
+
         location / {
                 proxy_pass http://127.0.0.1:{{apps.owncloud.port}};
                 proxy_redirect off;
