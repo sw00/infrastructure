@@ -1,15 +1,15 @@
 ---
-- name: add apt key
-  apt_key: keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
-
-- name: add apt repo
-  apt_repository: repo='deb https://get.docker.com/ubuntu docker main' state=present
+- apt: upgrade=dist
 
 - name: install docker package
-  apt: update_cache=yes name=lxc-docker state=present
+  apt: update_cache=yes name=docker.io state=latest
+  notify: add user to docker group
 
-- name: install docker-py
-  pip: name=docker-py state=present
+- name: install docker-py #v1.1.0 beca
+  pip: name=docker-py version=0.7.2 state=present
 
 - name: install docker-compose
-  pip: name=docker-compose state=present
+  pip: name=docker-compose state=latest
+
+- name: install requests
+  pip: name=requests state=latest

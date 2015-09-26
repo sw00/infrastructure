@@ -1,12 +1,20 @@
 ---
-- name: check out docker-owncloud repository
-  git: repo='git@github.com:sw00/docker-owncloud' accept_hostkey=yes
-       dest='/home/sett/docker-owncloud'
-  sudo: no
-
 - name: build the image
-  docker_image: name='sw00/owncloud' path=/home/sett/docker-owncloud state=build
+  docker_image: name=owncloud:8.1 state=present
 
-- name: run the container
-  docker: name=owncloud image='sw00/owncloud' ports='127.0.0.1:9000:80'
-          links=postgresdb:db volumes_from=data state=running
+- name: create data container
+  docker:
+    name: owncloud-data
+    image: owncloud:8.1
+    volumes:
+      - /var/data
+
+- name: run owncloud container
+  docker:
+    name: owncloud
+    image: owncloud:8.1
+    ports: "127.0.0.1:9000:80"
+    links:
+      - "postgresdb:db"
+    volumes_from: owncloud-data
+    state: running
