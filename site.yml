@@ -20,3 +20,8 @@
   sudo: yes
   roles:
   - {role: base, tags: ['base']}
+
+- hosts: beet
+  user: root
+  roles:
+    - {role: base, tags: ['base']}
