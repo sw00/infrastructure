@@ -15,6 +15,7 @@
     - {role: owncloud, tags: ['owncloud']}
     - {role: tinyrss, tags: ['tinyrss']}
     - {role: nginx, tags: ['nginx']}
+    - {role: znc, tags: ['znc']}
 
 - hosts: radish
   sudo: yes
