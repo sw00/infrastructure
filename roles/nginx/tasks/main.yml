@@ -9,3 +9,7 @@
 - name: configure reader.rigmaorlesoup.com
   include: reader.yml
   notify: restart nginx
+
+- name: configure talks.rigmarolesoup.com
+  include: talks.yml
+  notify: restart nginx

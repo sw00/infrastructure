@@ -1,0 +1,16 @@
+server {
+	server_name talks.rigmarolesoup.com;
+	listen 80;
+
+	listen 443 ssl;
+	ssl_certificate {{ssl_dir}}/rigmarolesoup.com.crt;
+	ssl_certificate_key {{ssl_dir}}/rigmarolesoup.com.key;
+
+	root /usr/share/nginx/html;
+	index index.html index.htm;
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+}
+
