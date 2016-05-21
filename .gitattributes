@@ -1,4 +1,4 @@
-hosts     filter=crypt diff=crypt
-*.crt     filter=crypt diff=crypt
-*.key     filter=crypt diff=crypt
-*id_rsa   filter=crypt diff=crypt
+hosts     filter=git-crypt diff=git-crypt
+*.crt     filter=git-crypt diff=git-crypt
+*.key     filter=git-crypt diff=git-crypt
+*_rsa   filter=git-crypt diff=git-crypt
