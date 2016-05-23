@@ -1,18 +1,28 @@
 ---
 - name: set the hostname
-  hostname: name="{{ inventory_hostname }}"
+  hostname: name="{{inventory_hostname}}"
 
 - name: edit localhost loopback in /etc/hosts
-  lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost leek'
+  lineinfile:
+    dest: /etc/hosts
+    regexp: ^127\.0\.0\.1
+    line: "127.0.0.1 localhost {{inventory_hostname}}"
 
 - name: update apt-cache
   apt: update_cache=yes
 
 - name: ensure user account exists
-  user: name=sett password="{{user_password}}" groups='sudo' append=yes shell=/bin/bash generate_ssh_key=yes state=present
+  user:
+    name: "{{USER_NAME}}"
+    password: "{{USER_PASSWORD}}"
+    groups: "sudo"
+    append: yes
+    shell: /bin/bash
+    generate_ssh_key: yes
+    state: present
 
 - name: add authorized key
-  authorized_key: user=sett key="{{ lookup('file', '/Users/sett/.ssh/id_rsa.pub') }}"
+  authorized_key: user="{{USER_NAME}}" key="{{USER_SSH_KEY}}"
 
 - name: install python
   apt: name=python state=present
