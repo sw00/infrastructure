@@ -1,0 +1,50 @@
+---
+- name: stop the postgres container
+  docker_container:
+    name: postgres
+    state: stopped
+
+- name: restore postgres
+  docker_container:
+    name: restore-postgres
+    image: postgres
+    entrypoint: /bin/tar
+    command: ["xvf", "/backup/postgres_backup_latest.tgz", "-C", "/"]
+    detach: no
+    volumes_from: postgres-data
+    volumes:
+      - "{{ HOST_BACKUP_DIR }}:/backup"
+
+- name: start the postgres container
+  docker_container:
+    name: postgres
+    state: started
+
+- name: stop the owncloud container
+  docker_container:
+    name: owncloud
+    state: stopped
+
+- name: restore owncloud data
+  docker_container:
+    name: restore-owncloud
+    image: owncloud
+    entrypoint: /bin/tar
+    command: ["xvf", "/backup/owncloud_backup_latest.tgz", "-C", "/"]
+    detach: no
+    volumes_from: owncloud-data
+    volumes:
+      - "{{ HOST_BACKUP_DIR }}:/backup"
+
+- name: start the owncloud container
+  docker_container:
+    name: owncloud
+    state: started
+
+- name: cleanup containers
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - restore-owncloud
+    - restore-postgres

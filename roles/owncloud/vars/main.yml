@@ -1,2 +1,4 @@
 ---
 HOST_BACKUP_DIR: /var/backups/owncloud
+BACKUP: no
+RESTORE: no

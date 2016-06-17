@@ -18,8 +18,9 @@
     image: postgres
     volumes_from:
       - postgres-data
-    ports:
-      - 5432
+    env:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
 
 - name: create owncloud data container
   docker_container:
@@ -37,3 +38,12 @@
     links:
       - postgres:db
 
+- name: backup owncloud
+  include: backup.yml
+  tags: backup
+  when: BACKUP|default(false)
+
+- name: restore owncloud
+  include: restore.yml
+  tags: restore
+  when: RESTORE|default(false)

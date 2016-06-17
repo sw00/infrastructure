@@ -2,16 +2,39 @@
 # back up and tar owncloud data
 
 - name: ensure backup directory exists on host
-  file: path={{HOST_BACKUP_DIR}} state=directory
+  file: path={{ HOST_BACKUP_DIR }} state=directory
 
-- name: create the backup
+- name: create the data backup
   docker_container:
     name: backup-owncloud
-    command: tar cvf /backup/owncloud_backup.tgz /var/www/html
-    tty: yes
-    image: ubuntu
+    image: owncloud
+    entrypoint: /bin/tar
+    command: ["cvf", "/backup/owncloud_backup_{{ ansible_date_time.date }}.tgz", "/var/www/html"]
+    detach: no
     volumes_from: owncloud-data
     volumes:
-      - {{HOST_BACKUP_DIR}}:/backup
-  notify: remove backup container
+      - "{{ HOST_BACKUP_DIR }}:/backup"
+  notify: remove owncloud backup container
+
+- name: link latest backup for convenience
+  file:
+    src: "{{ HOST_BACKUP_DIR }}/owncloud_backup_{{ ansible_date_time.date }}.tgz"
+    dest: "{{ HOST_BACKUP_DIR }}/owncloud_backup_latest.tgz"
+
+- name: create the db backup
+  docker_container:
+    name: backup-postgres
+    image: postgres
+    entrypoint: /bin/tar
+    command: ["cvf", "/backup/postgres_backup_{{ ansible_date_time.date }}.tgz", "/dbdata"]
+    detach: no
+    volumes_from: postgres-data 
+    volumes:
+      - "{{ HOST_BACKUP_DIR }}:/backup"
+  notify: remove postgres backup container
+
+- name: link latest backup for convenience
+  file:
+    src: "{{ HOST_BACKUP_DIR }}/postgres_backup_{{ ansible_date_time.date }}.tgz"
+    dest: "{{ HOST_BACKUP_DIR }}/postgres_backup_latest.tgz"
 

@@ -1,5 +1,11 @@
 ---
-- name: remove backup container
+- name: remove owncloud backup container
   docker_container:
     name: backup-owncloud
     state: absent
+
+- name: remove postgres backup container
+  docker_container:
+    name: backup-postgres
+    state: absent
+

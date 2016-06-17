@@ -40,3 +40,16 @@
   include: renew.yml
   when: not issued_cert.stat.exists or RENEW
 
+- name: start nginx
+  docker_container:
+    name: nginx
+    image: nginx
+    volumes_from:
+      - nginx-data
+      - letsencrypt-data
+    links:
+      - "{{ CONTAINER_NAME }}:{{ PROXY_PASS_HOST }}"
+    ports:
+      - 0.0.0.0:80:80
+      - 0.0.0.0:443:443
+

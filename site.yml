@@ -3,9 +3,15 @@
   vars:
     USER_SSH_KEY: "{{lookup('file', '~/.ssh/leek_rsa.pub')}}"
   roles:
-    - {role: base, tags: ['base']}
+    - role: base
+      tags: base
+
     - role: docker_ubuntu
-    - {role: owncloud, tags: ['owncloud']}
+      tags: docker
+
+    - role: owncloud
+      tags: owncloud
+
     - role: nginx
       DOMAIN: cloud.rigmarolesoup.com
       CONTAINER_NAME: owncloud
