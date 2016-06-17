@@ -1,0 +1,8 @@
+---
+DOMAIN: mydomain
+CONTAINER_NAME: None
+PROXY_PASS_HOST: "{{ CONTAINER_NAME }}"
+PROXY_PASS_PORT: 80
+PRODUCTION: no
+RENEW: no
+EMAIL_ADDRESS: sett.wai@gmail.com

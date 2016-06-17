@@ -1,86 +1,42 @@
 ---
-- name: pull the nginx image
-  docker_image: name=nginx:stable state=present
+- name: pull the docker images
+  docker_image: name={{ item }} state=present
+  with_items:
+    - nginx:stable
+    - quay.io/letsencrypt/letsencrypt
 
-- name: pull the letsencrypt image
-  docker_image: name=quay.io/letsencrypt/letsencrypt state=present
-
-- name: create letsencrypt shared dir
-  file: path=/var/data/letsencrypt state=directory
+- name: create shared directories on host
+  file: path={{ item }} state=directory
+  with_items:
+    - /var/data/letsencrypt
+    - /var/data/nginx
 
 - name: create the letsencrypt data container
   docker_container:
     name: letsencrypt-data
     image: quay.io/letsencrypt/letsencrypt
-    recreate: yes
     volumes:
       - /var/data/letsencrypt:/etc/letsencrypt
       - /var/lib/letsencrypt
     entrypoint: /bin/mkdir
     command: -p /etc/letsencrypt/webrootauth/
 
-- name: create data directory on host
-  file: path=/var/data/nginx state=directory
-
-- name: get new certs
+- name: create the nginx data container
   docker_container:
-    name: letsencrypt
-    image: quay.io/letsencrypt/letsencrypt:latest
-    recreate: yes
-    ports:
-      - 443:443
-      - 80:80
-    volumes_from:
-      - letsencrypt-data
-    entrypoint: certbot
-    command: ["certonly", "--server", "https://acme-staging.api.letsencrypt.org/directory", "--domain", "cloud.rigmarolesoup.com", "--authenticator", "standalone", "--email", "sett.wai@gmail.com", "--agree-tos"]
-
-- name: generate dhparams
-  docker_container:
-    name: tmp-dhparams
+    name: nginx-data
     image: nginx
-    recreate: yes
-    entrypoint: openssl
-    command: ["dhparam", "-out", "/etc/letsencrypt/live/cloud.rigmarolesoup.com/dhparams.pem", "2048"]
-    volumes_from:
-      - letsencrypt-data
-
-- name: wait until dhparams created
-  wait_for: path=/var/data/letsencrypt/live/cloud.rigmarolesoup.com/dhparams.pem state=present
-
-- name: copy site configs for nginx
-  copy: dest=/var/data/nginx/ src=cloud.nginx.conf
-
-- name: run nginx
-  docker_container:
-    name: nginx
-    image: nginx
-    recreate: yes
     volumes:
       - /var/data/nginx:/etc/nginx/conf.d
-    volumes_from:
-      - letsencrypt-data
-    links:
-      - owncloud:owncloud
-    ports:
-      - 0.0.0.0:80:80
-      - 0.0.0.0:443:443
+    entrypoint: /bin/true
 
-# - name: run nginx
-#   docker_service:
-#     project_name: owncloud
-#     definition:
-#       version: '2'
-#       services:
-#         nginx:
-#           image: nginx
-#           volumes:
-#             - /var/data/nginx:/etc/nginx/conf.d
-#           links:
-#             - owncloud:owncloud
-#           volumes_from:
-#             - letsencrypt-data
-#         owncloud:
-#           image: owncloud:9
-#   tags: wip
+- name: template nginx conf file
+  template: dest="/var/data/nginx/{{ DOMAIN }}.conf" src=nginx.conf.j2
+
+- name: check if certificates already issued
+  stat: path=/var/data/letsencrypt/live/{{ DOMAIN }}/cert.pem
+  register: issued_cert
+
+- name: renew certificates
+  include: renew.yml
+  when: not issued_cert.stat.exists or RENEW
 

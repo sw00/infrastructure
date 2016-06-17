@@ -6,5 +6,9 @@
     - {role: base, tags: ['base']}
     - role: docker_ubuntu
     - {role: owncloud, tags: ['owncloud']}
-    - {role: nginx, tags: ['nginx']}
+    - role: nginx
+      DOMAIN: cloud.rigmarolesoup.com
+      CONTAINER_NAME: owncloud
+      PROXY_PASS_PORT: 80
+      tags: nginx
 

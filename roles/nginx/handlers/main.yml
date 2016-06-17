@@ -1,0 +1,15 @@
+---
+- name: reload nginx
+  docker_container:
+    name: nginx
+    image: nginx
+    recreate: yes
+    volumes_from:
+      - nginx-data
+      - letsencrypt-data
+    links:
+      - "{{ CONTAINER_NAME }}:{{ PROXY_PASS_HOST }}"
+    ports:
+      - 0.0.0.0:80:80
+      - 0.0.0.0:443:443
+
