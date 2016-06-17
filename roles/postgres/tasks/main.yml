@@ -1,9 +1,14 @@
 ---
 - name: pull docker image
-  docker_image: name=postgres:9.4 state=present
+  docker_image: 
+    docker_api_version: '1.20'
+    name: postgres
+    tag: 9.4
+    path: .
 
 - name: create data container
   docker:
+    docker_api_version: '1.20'
     name: postgres-data
     image: postgres:9.4
     volumes:
@@ -12,6 +17,7 @@
 
 - name: run postgres container
   docker:
+    docker_api_version: '1.20'
     image: postgres:9.4
     name: postgresdb
     volumes_from: postgres-data

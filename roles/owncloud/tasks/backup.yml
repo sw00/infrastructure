@@ -1,0 +1,17 @@
+---
+# back up and tar owncloud data
+
+- name: ensure backup directory exists on host
+  file: path={{HOST_BACKUP_DIR}} state=directory
+
+- name: create the backup
+  docker_container:
+    name: backup-owncloud
+    command: tar cvf /backup/owncloud_backup.tgz /var/www/html
+    tty: yes
+    image: ubuntu
+    volumes_from: owncloud-data
+    volumes:
+      - {{HOST_BACKUP_DIR}}:/backup
+  notify: remove backup container
+

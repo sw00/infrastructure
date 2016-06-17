@@ -1,0 +1,5 @@
+---
+- name: remove backup container
+  docker_container:
+    name: backup-owncloud
+    state: absent

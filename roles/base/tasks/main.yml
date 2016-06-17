@@ -11,18 +11,8 @@
 - name: update apt-cache
   apt: update_cache=yes
 
-- name: ensure user account exists
-  user:
-    name: "{{USER_NAME}}"
-    password: "{{USER_PASSWORD}}"
-    groups: "sudo"
-    append: yes
-    shell: /bin/bash
-    generate_ssh_key: yes
-    state: present
-
 - name: add authorized key
-  authorized_key: user="{{USER_NAME}}" key="{{USER_SSH_KEY}}"
+  authorized_key: user=root key="{{USER_SSH_KEY}}" exclusive=yes
 
 - name: install python
   apt: name=python state=present
@@ -32,3 +22,6 @@
 
 - name: install git
   apt: name=git state=present
+
+- name: create /var/data
+  file: path=/var/data state=directory

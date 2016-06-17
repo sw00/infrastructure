@@ -1,20 +1,39 @@
 ---
-- name: build the image
-  docker_image: name=owncloud:8.1 state=present
+- name: pull postgres image
+  docker_image: name=postgres state=present
 
-- name: create data container
-  docker:
-    name: owncloud-data
-    image: owncloud:8.1
+- name: pull owncloud image
+  docker_image: name=owncloud state=present
+    
+- name: create postgres data container
+  docker_container:
+    name: postgres-data
+    image: postgres
     volumes:
-      - /var/data
+      - /dbdata
 
-- name: run owncloud container
-  docker:
+- name: start postgres container
+  docker_container:
+    name: postgres
+    image: postgres
+    volumes_from:
+      - postgres-data
+    ports:
+      - 5432
+
+- name: create owncloud data container
+  docker_container:
+    name: owncloud-data
+    image: owncloud:9
+    volumes:
+      - /var/www/html
+
+- name: start owncloud container
+  docker_container:
     name: owncloud
-    image: owncloud:8.1
-    ports: "127.0.0.1:9000:80"
+    image: owncloud:9
+    volumes_from:
+      - owncloud-data
     links:
-      - "postgresdb:db"
-    volumes_from: owncloud-data
-    state: running
+      - postgres:db
+

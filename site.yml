@@ -1,29 +1,10 @@
 - hosts: leek
   user: root
-  vars_prompt:
-    - name: "USER_PASSWORD"
-      prompt: "Enter a password for the user"
-      private: yes
-      encrypt: "sha512_crypt"
-      confirm: yes
-      salt_size: 7
   vars:
-    USER_NAME: sett
     USER_SSH_KEY: "{{lookup('file', '~/.ssh/leek_rsa.pub')}}"
   roles:
     - {role: base, tags: ['base']}
     - role: docker_ubuntu
-      docker_group_members: ["{{USER_NAME}}"]
-    - {role: postgres, tags: ['postgres']}
     - {role: owncloud, tags: ['owncloud']}
     - {role: nginx, tags: ['nginx']}
 
-- hosts: radish
-  sudo: yes
-  roles:
-  - {role: base, tags: ['base']}
-
-- hosts: beet
-  user: root
-  roles:
-    - {role: base, tags: ['base']}
