@@ -1,7 +1,0 @@
----
-- name: configure reader app vhost
-  template: dest='/etc/nginx/sites-available/reader.rigmarolesoup.com' src=reader.nginx.conf.j2
-
-- name: enable the reader app vhost
-  file: path='/etc/nginx/sites-enabled/reader.rigmarolesoup.com' 
-        src='/etc/nginx/sites-available/reader.rigmarolesoup.com' state=link
