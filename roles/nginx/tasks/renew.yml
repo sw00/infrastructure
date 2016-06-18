@@ -1,15 +1,9 @@
-- name: destroy nginx container
-  docker_container:
-    name: nginx
-    state: absent
-    force_kill: yes
-
 - name: get new certs (staging)
   when: not PRODUCTION
   docker_container:
     name: letsencrypt
     image: quay.io/letsencrypt/letsencrypt:latest
-    recreate: yes
+    detach: no
     ports:
       - 443:443
       - 80:80
@@ -18,19 +12,34 @@
     entrypoint: certbot
     command: ["certonly", "--server", "https://acme-staging.api.letsencrypt.org/directory", "--domain", "{{ DOMAIN }}", "--authenticator", "standalone", "--email", "{{ EMAIL_ADDRESS }}", "--agree-tos"]
 
+- name: clean up staging certs
+  when: PRODUCTION
+  shell: >-
+        docker run --rm \
+        --volumes-from letsencrypt-data \
+        alpine \
+        sh -c 'rm -r /etc/letsencrypt/* /var/lib/letsencrypt/*'
+  ignore_errors: yes
+
+- name: recreate webrootauth dir
+  shell: >-
+        docker run --rm \
+        --volumes-from letsencrypt-data \
+        alpine \
+        mkdir -p /etc/letsencrypt/webrootauth/
+  ignore_errors: yes
+
 - name: get new certs (production)
   when: PRODUCTION
   docker_container:
     name: letsencrypt
     image: quay.io/letsencrypt/letsencrypt:latest
     recreate: yes
-    ports:
-      - 443:443
-      - 80:80
+    detach: no
     volumes_from:
       - letsencrypt-data
     entrypoint: certbot
-    command: ["certonly", "--domain", "{{ DOMAIN }}", "--authenticator", "standalone", "--email", "{{ EMAIL_ADDRESS }}", "--agree-tos"]
+    command: ["certonly", "--domain", "{{ DOMAIN }}", "--authenticator", "webroot", "--webroot-path", "/etc/letsencrypt/webrootauth/", "--email", "{{ EMAIL_ADDRESS }}", "--agree-tos"]
 
 - name: generate dhparams
   docker_container:
@@ -38,10 +47,11 @@
     image: nginx
     recreate: yes
     entrypoint: openssl
-    command: ["dhparam", "-out", "/etc/letsencrypt/live/{{ DOMAIN }}/dhparams.pem", "2048"]
+    command: ["dhparam", "-out", "/etc/letsencrypt/dhparams.pem", "2048"]
     volumes_from:
       - letsencrypt-data
 
 - name: wait until dhparams created
   wait_for: path="/var/data/letsencrypt/live/{{ DOMAIN }}/dhparams.pem" state=present
   notify: reload nginx
+

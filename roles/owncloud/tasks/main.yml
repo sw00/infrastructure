@@ -25,7 +25,7 @@
 - name: create owncloud data container
   docker_container:
     name: owncloud-data
-    image: owncloud:9
+    image: owncloud
     volumes:
       - /var/www/html
 
