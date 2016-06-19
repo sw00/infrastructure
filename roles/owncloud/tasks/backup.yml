@@ -20,21 +20,25 @@
   file:
     src: "{{ HOST_BACKUP_DIR }}/owncloud_backup_{{ ansible_date_time.date }}.tgz"
     dest: "{{ HOST_BACKUP_DIR }}/owncloud_backup_latest.tgz"
+    state: link
 
 - name: create the db backup
   docker_container:
     name: backup-postgres
     image: postgres
-    entrypoint: /bin/tar
-    command: ["cvf", "/backup/postgres_backup_{{ ansible_date_time.date }}.tgz", "/dbdata"]
+    entrypoint: pg_dump
+    command: ["owncloud", "-h", "db", "-U", "postgres", "-f", "/backup/postgres_backup_{{ ansible_date_time.date }}.bak"]
     detach: no
     volumes_from: postgres-data 
     volumes:
       - "{{ HOST_BACKUP_DIR }}:/backup"
+    links:
+      - postgres:db
   notify: remove postgres backup container
 
 - name: link latest backup for convenience
   file:
-    src: "{{ HOST_BACKUP_DIR }}/postgres_backup_{{ ansible_date_time.date }}.tgz"
-    dest: "{{ HOST_BACKUP_DIR }}/postgres_backup_latest.tgz"
+    src: "{{ HOST_BACKUP_DIR }}/postgres_backup_{{ ansible_date_time.date }}.bak"
+    dest: "{{ HOST_BACKUP_DIR }}/postgres_backup_latest.bak"
+    state: link
 
