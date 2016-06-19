@@ -1,5 +1,9 @@
 ---
-# back up and tar owncloud data
+# back up and tar owncloud data and psqldump
+# then upload to s3 bucket
+
+- name: install dependencies
+  pip: name=boto state=present
 
 - name: ensure backup directory exists on host
   file: path={{ HOST_BACKUP_DIR }} state=directory
@@ -16,11 +20,20 @@
       - "{{ HOST_BACKUP_DIR }}:/backup"
   notify: remove owncloud backup container
 
-- name: link latest backup for convenience
-  file:
+- name: save data backup to Amazon S3
+  s3:
+    object: "/backups/owncloud_backup_{{ ansible_date_time.date }}.tgz"
     src: "{{ HOST_BACKUP_DIR }}/owncloud_backup_{{ ansible_date_time.date }}.tgz"
-    dest: "{{ HOST_BACKUP_DIR }}/owncloud_backup_latest.tgz"
-    state: link
+    bucket: rigmarolesoup
+    region: eu-west-1
+    mode: put
+    access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+    secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+
+- name: remove data backup to save space
+  file:
+    path: "{{ HOST_BACKUP_DIR }}/owncloud_backup_{{ ansible_date_time.date }}.tgz"
+    state: absent
 
 - name: create the db backup
   docker_container:
@@ -36,9 +49,18 @@
       - postgres:db
   notify: remove postgres backup container
 
-- name: link latest backup for convenience
-  file:
+- name: save db backup to Amazon S3
+  s3:
+    object: "/backups/postgres_backup_{{ ansible_date_time.date }}.bak"
     src: "{{ HOST_BACKUP_DIR }}/postgres_backup_{{ ansible_date_time.date }}.bak"
-    dest: "{{ HOST_BACKUP_DIR }}/postgres_backup_latest.bak"
-    state: link
+    region: eu-west-1
+    bucket: rigmarolesoup
+    mode: put
+    access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+    secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+
+- name: remove db backup to save space
+  file:
+    path: "{{ HOST_BACKUP_DIR }}/postgres_backup_{{ ansible_date_time.date }}.bak"
+    state: absent
 
