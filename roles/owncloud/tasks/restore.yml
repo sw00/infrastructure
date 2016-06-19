@@ -1,24 +1,21 @@
 ---
-- name: stop the postgres container
+- name: ensure postgres is started
   docker_container:
     name: postgres
-    state: stopped
+    state: started
 
 - name: restore postgres
   docker_container:
     name: restore-postgres
     image: postgres
-    entrypoint: /bin/tar
-    command: ["xvf", "/backup/postgres_backup_latest.tgz", "-C", "/"]
+    entrypoint: pg_restore
+    command: ["-c", "-d", "owncloud", "-h", "db", "-U", "postgres", "/backup/postgres_backup_latest.tgz"]
     detach: no
     volumes_from: postgres-data
     volumes:
       - "{{ HOST_BACKUP_DIR }}:/backup"
-
-- name: start the postgres container
-  docker_container:
-    name: postgres
-    state: started
+    links:
+      - postgres:db
 
 - name: stop the owncloud container
   docker_container:
