@@ -30,7 +30,9 @@
     name: restore-postgres
     image: postgres
     entrypoint: pg_restore
-    command: ["-c", "-d", "owncloud", "-h", "db", "-U", "postgres", "/backup/{{ DB_BACKUP_FILE }}"]
+    command: ["-c", "-d", "owncloud", "-h", "db", "-U", "docker", "/backup/{{ DB_BACKUP_FILE }}"]
+    env:
+      PGPASSWORD: docker
     detach: no
     volumes_from: postgres-data
     volumes:

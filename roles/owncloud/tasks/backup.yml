@@ -40,7 +40,9 @@
     name: backup-postgres
     image: postgres
     entrypoint: pg_dump
-    command: ["owncloud", "-h", "db", "-U", "postgres", "-f", "/backup/postgres_backup_{{ ansible_date_time.date }}.bak"]
+    command: ["owncloud", "-h", "db", "-U", "postgres", "-F", "c", "-f", "/backup/postgres_backup_{{ ansible_date_time.date }}.bak"]
+    env:
+      PGPASSWORD: docker
     detach: no
     volumes_from: postgres-data 
     volumes:
