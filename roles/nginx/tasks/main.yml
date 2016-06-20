@@ -20,6 +20,7 @@
       - /var/lib/letsencrypt
     entrypoint: /bin/mkdir
     command: -p /etc/letsencrypt/webrootauth/
+    detach: no
 
 - name: create the nginx data container
   docker_container:
@@ -28,6 +29,7 @@
     volumes:
       - /var/data/nginx:/etc/nginx/conf.d
     entrypoint: /bin/true
+    detach: no
 
 - name: template nginx conf file
   template: dest="/var/data/nginx/{{ DOMAIN }}.conf" src=nginx.conf.j2

@@ -1,0 +1,9 @@
+- hosts: all
+  user: root
+  vars:
+    HOST_BACKUP_DIR: /var/backups/owncloud
+    DATA_BACKUP_FILE: owncloud_backup_2016-06-19.tgz
+    DB_BACKUP_FILE: postgres_backup_2016-06-19.bak
+  tasks:
+    - name: restore owncloud
+      include: ../roles/owncloud/tasks/restore.yml
