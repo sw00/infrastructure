@@ -12,9 +12,17 @@
     - role: owncloud
       tags: owncloud
 
+    - role: gogs
+      tags: gogs
+
     - role: nginx
-      DOMAIN: cloud.rigmarolesoup.com
-      CONTAINER_NAME: owncloud
-      PROXY_PASS_PORT: 80
       tags: nginx
+      UPSTREAM_APPS:
+        - DOMAIN: cloud.rigmarolesoup.com
+          CONTAINER_NAME: owncloud
+          PROXY_PASS_PORT: 80
+
+        - DOMAIN: code.rigmarolesoup.com
+          CONTAINER_NAME: gogs
+          PROXY_PASS_PORT: 3000
 

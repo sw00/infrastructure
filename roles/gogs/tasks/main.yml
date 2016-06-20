@@ -1,0 +1,27 @@
+---
+- name: pull gogs image
+  docker_image:
+    name: gogs/gogs
+    state: present
+
+- name: create data directory on host
+  file: path=/var/data/gogs state=directory
+
+- name: create data container
+  docker_container:
+    name: gogs-data
+    image: gogs/gogs
+    entrypoint: /bin/true
+    volumes:
+      - /var/data/gogs:/data
+
+- name: run gogs
+  docker_container:
+    name: gogs
+    image: gogs/gogs
+    recreate: yes
+    volumes_from: 
+      - gogs-data
+    ports:
+      - 1022:22
+

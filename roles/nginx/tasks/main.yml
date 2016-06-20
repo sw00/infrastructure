@@ -31,16 +31,10 @@
     entrypoint: /bin/true
     detach: no
 
-- name: template nginx conf file
-  template: dest="/var/data/nginx/{{ DOMAIN }}.conf" src=nginx.conf.j2
-
-- name: check if certificates already issued
-  stat: path=/var/data/letsencrypt/live/{{ DOMAIN }}/cert.pem
-  register: issued_cert
-
-- name: renew certificates
-  include: renew.yml
-  when: not issued_cert.stat.exists or RENEW
+- name: acme-challenge for our domains
+  template: dest="/var/data/nginx/{{ item.DOMAIN }}.acme.conf" src=acme.conf.j2
+  with_items:
+    - "{{ UPSTREAM_APPS }}"
 
 - name: start nginx
   docker_container:
@@ -49,9 +43,22 @@
     volumes_from:
       - nginx-data
       - letsencrypt-data
-    links:
-      - "{{ CONTAINER_NAME }}:{{ PROXY_PASS_HOST }}"
+    links: "{{ UPSTREAM_APPS|map(attribute='CONTAINER_NAME')|list }}"
     ports:
       - 0.0.0.0:80:80
       - 0.0.0.0:443:443
+
+- name: check if certificates already issued
+  stat: path=/var/data/letsencrypt/live/{{ item.DOMAIN }}/cert.pem
+  register: stat_certs
+  with_items: "{{ UPSTREAM_APPS }}"
+
+- debug: msg="{{ stat_certs }}"
+
+- name: renew certificates
+  include: renew.yml
+  with_items: "{{ stat_certs.results }}"
+  when: not outer_item.stat.exists or RENEW
+  loop_control:
+    loop_var: outer_item
 

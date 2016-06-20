@@ -39,7 +39,7 @@ server {
     client_max_body_size 1024m;
     
     location / {
-    	proxy_pass http://{{ PROXY_PASS_HOST }}:{{ PROXY_PASS_PORT }};
+    	proxy_pass http://{{ CONTAINER_NAME }}:{{ PROXY_PASS_PORT }};
     	proxy_redirect off;
     	proxy_buffering off;
     	proxy_set_header        Host    $host;
@@ -59,14 +59,5 @@ server {
     location ~ ^/(?:\.htaccess|data|config|db_structure\.xml|README){
     	deny all;
     }
-
-   # Pass the ACME challenge from letsencrypt to a directory within the container
-
-   location /.well-known/acme-challenge {
-     alias /etc/letsencrypt/webrootauth/.well-known/acme-challenge;
-     location ~ /.well-known/acme-challenge/(.*) {
-       add_header Content-Type application/jose+json;
-     }
-   }
 
 }
