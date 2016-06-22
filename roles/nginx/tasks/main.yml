@@ -32,6 +32,11 @@
     entrypoint: /bin/true
     detach: no
 
+- name: clear nginx conf directory
+  file: path="{{ item }}" state=absent
+  with_fileglob:
+    - /var/data/nginx/*
+
 - name: acme-challenge for our domains
   template: dest="/var/data/nginx/{{ item.DOMAIN }}.acme.conf" src=acme.conf.j2
   with_items:
@@ -64,4 +69,24 @@
   when: not outer_item.stat.exists or RENEW
   loop_control:
     loop_var: outer_item
+
+- name: check if dhparams exists
+  stat: path=/etc/letsencrypt/dhparams.pem
+  register: dhparams_result
+
+- name: generate dhparams
+  docker_container:
+    name: tmp-dhparams
+    image: nginx
+    recreate: yes
+    detach: no
+    entrypoint: openssl
+    command: ["dhparam", "-out", "/etc/letsencrypt/dhparams.pem", "2048"]
+    volumes_from:
+      - letsencrypt-data
+  when: not dhparams_result.stat.exists
+
+- name: wait until dhparams created
+  wait_for: path="/var/data/letsencrypt/dhparams.pem" state=present
+  notify: reload nginx
 
