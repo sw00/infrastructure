@@ -10,6 +10,6 @@ server {
     }
 
     location / {
-        return 301 https://{{ item.DOMAIN }}$request_uri;
+    	rewrite ^ https://$server_name$requet_uri permanent;
     }
 }
