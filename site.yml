@@ -14,6 +14,7 @@
 
     - role: gogs
       tags: gogs
+      DB_CONTAINER: postgres
 
     - role: nginx
       tags: nginx

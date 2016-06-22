@@ -22,6 +22,8 @@
     recreate: yes
     volumes_from: 
       - gogs-data
+    links:
+      - "{{ DB_CONTAINER }}:db"
     ports:
       - 1022:22
 
