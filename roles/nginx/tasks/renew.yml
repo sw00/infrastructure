@@ -1,12 +1,7 @@
-- name: collect domains
-  set_fact:
-    certbot_domains: "{% set certbot_domains = certbot_domains|default([]) + ['--domain', item.DOMAIN] %}{{ certbot_domains|list }}"
-  with_items: "{{ UPSTREAM_APPS }}"
-
 - name: define certbot arguments
   set_fact:
     certbot_cmd: "{{ ['certonly', '--server', 'https://acme-staging.api.letsencrypt.org/directory'] if not PRODUCTION else ['certonly'] }}"
-    certbot_args: "{{ ['--authenticator', 'webroot', '--email', '{{ EMAIL_ADDRESS }}', '--agree-tos'] }}"
+    certbot_args: "{{ ['--webroot', '--webroot-path', '/etc/letsencrypt/webrootauth/', '--email', '{{ EMAIL_ADDRESS }}', '--agree-tos', '--non-interactive', '--force-renewal'] }}"
 
 - name: backup letsencrypt data
   when: RENEW
@@ -15,9 +10,10 @@
 - name: delete old certs and config
   when: RENEW
   file: path={{ item }} state=absent
-  with_items:
-    - /var/data/letsencrypt/live
-    - /var/data/letsencrypt/renewal
+  with_fileglob:
+    - /var/data/letsencrypt/live/*
+    - /var/data/letsencrypt/renewal/*
+    - /var/data/letsnencrypt/archive/*
 
 - name: get new certs
   docker_container:
@@ -28,10 +24,18 @@
     volumes_from:
       - letsencrypt-data
     entrypoint: certbot
-    command: "{{ certbot_cmd + certbot_args + certbot_domains }}"
+    command: "{{ certbot_cmd + certbot_args + ['-d', item.DOMAIN]}}"
+  with_items: "{{ UPSTREAM_APPS }}"
+
+- name: wait for certs
+  wait_for: path="/var/data/letsencrypt/live/{{ item.DOMAIN }}" timeout=5
+  with_items: "{{ UPSTREAM_APPS }}"
 
 - name: template nginx conf files
   template: dest="/var/data/nginx/{{ item.DOMAIN }}.conf" src=nginx.conf.j2
+  vars:
+    CONTAINER_NAME: "{{ item.CONTAINER_NAME }}"
+    PROXY_PASS_PORT: "{{ item.PROXY_PASS_PORT }}"
   with_items: "{{ UPSTREAM_APPS }}"
   notify: reload nginx
 
@@ -44,6 +48,7 @@
     name: tmp-dhparams
     image: nginx
     recreate: yes
+    detach: no
     entrypoint: openssl
     command: ["dhparam", "-out", "/etc/letsencrypt/dhparams.pem", "2048"]
     volumes_from:
@@ -51,6 +56,6 @@
   when: not dhparams_result.stat.exists
 
 - name: wait until dhparams created
-  wait_for: path="/var/data/letsencrypt/live/{{ DOMAIN }}/dhparams.pem" state=present
+  wait_for: path="/var/data/letsencrypt/dhparams.pem" state=present
   notify: reload nginx
 

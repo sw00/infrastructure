@@ -7,9 +7,7 @@
     volumes_from:
       - nginx-data
       - letsencrypt-data
-    links:
-      - "{{ CONTAINER_NAME }}:{{ PROXY_PASS_HOST }}"
+    links: "{{ UPSTREAM_APPS|map(attribute='CONTAINER_NAME')|list }}"
     ports:
       - 0.0.0.0:80:80
       - 0.0.0.0:443:443
-

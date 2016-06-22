@@ -15,11 +15,12 @@
   docker_container:
     name: letsencrypt-data
     image: quay.io/letsencrypt/letsencrypt
+    recreate: yes
     volumes:
       - /var/data/letsencrypt:/etc/letsencrypt
       - /var/lib/letsencrypt
     entrypoint: /bin/mkdir
-    command: -p /etc/letsencrypt/webrootauth/
+    command: ['-p', '/etc/letsencrypt/webrootauth/']
     detach: no
 
 - name: create the nginx data container
@@ -40,6 +41,7 @@
   docker_container:
     name: nginx
     image: nginx
+    recreate: yes
     volumes_from:
       - nginx-data
       - letsencrypt-data
@@ -48,12 +50,13 @@
       - 0.0.0.0:80:80
       - 0.0.0.0:443:443
 
+- name: wait for nginx
+  wait_for: port=80 timeout=10
+
 - name: check if certificates already issued
   stat: path=/var/data/letsencrypt/live/{{ item.DOMAIN }}/cert.pem
   register: stat_certs
   with_items: "{{ UPSTREAM_APPS }}"
-
-- debug: msg="{{ stat_certs }}"
 
 - name: renew certificates
   include: renew.yml
