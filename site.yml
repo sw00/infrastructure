@@ -9,8 +9,12 @@
     - role: docker_ubuntu
       tags: docker
 
+    - role: postgres
+      tags: postgres
+
     - role: owncloud
       tags: owncloud
+      DB_CONTAINER: postgres
 
     - role: gogs
       tags: gogs

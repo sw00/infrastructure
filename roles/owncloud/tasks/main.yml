@@ -1,29 +1,7 @@
 ---
-- name: pull postgres image
-  docker_image: name=postgres state=present
-
 - name: pull owncloud image
   docker_image: name=owncloud state=present
     
-- name: create postgres data container
-  docker_container:
-    name: postgres-data
-    image: postgres
-    volumes:
-      - /var/lib/postgresql/data
-    entrypoint: /bin/true
-
-- name: start postgres container
-  docker_container:
-    name: postgres
-    image: postgres
-    recreate: yes
-    volumes_from:
-      - postgres-data
-    env:
-      POSTGRES_USER: docker
-      POSTGRES_PASSWORD: docker
-
 - name: create owncloud data container
   docker_container:
     name: owncloud-data
@@ -40,4 +18,4 @@
     volumes_from:
       - owncloud-data
     links:
-      - postgres:db
+      - "{{ DB_CONTAINER }}:db"
