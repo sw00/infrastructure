@@ -1,0 +1,20 @@
+---
+# tasks to set up the db for mattermost
+
+- name: copy the bootstrap sql accross
+  copy: dest=/tmp/mattermost-bootstrap.sql src=bootstrap.sql
+
+- name: bootstrap the db based on script
+  docker_container:
+    name: tmp-psql
+    image: postgres
+    entrypoint: psql
+    command: ["-h", "db", "-U", "{{ POSTGRES_USER }}", "-f", "/tmp/mattermost-bootstrap.sql"]
+    detach: no
+    env:
+      PGPASSWORD: "{{ POSTGRES_PASSWORD }}"
+    volumes:
+      - /tmp:/tmp
+    links:
+      - "{{ DB_CONTAINER }}:db"
+

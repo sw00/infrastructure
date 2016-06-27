@@ -20,6 +20,10 @@
       tags: gogs
       DB_CONTAINER: postgres
 
+    - role: mattermost
+      tags: mattermost
+      DB_CONTAINER: postgres
+
     - role: nginx
       tags: nginx
       UPSTREAM_APPS:
@@ -30,4 +34,8 @@
         - DOMAIN: code.rigmarolesoup.com
           CONTAINER_NAME: gogs
           PROXY_PASS_PORT: 3000
+
+        - DOMAIN: chat.rigmarolesoup.com
+          CONTAINER_NAME: mattermost
+          PROXY_PASS_PORT: 80
 
