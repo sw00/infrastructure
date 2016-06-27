@@ -10,6 +10,6 @@ server {
     }
 
     location / {
-    	rewrite ^ https://$server_name$requet_uri permanent;
+    	rewrite ^ https://$server_name$request_uri permanent;
     }
 }
