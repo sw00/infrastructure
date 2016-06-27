@@ -23,6 +23,7 @@
     - role: mattermost
       tags: mattermost
       DB_CONTAINER: postgres
+      NGINX_CONF: /var/data/nginx/chat.rigmarolesoup.com.conf
 
     - role: nginx
       tags: nginx

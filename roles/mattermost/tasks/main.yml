@@ -40,4 +40,5 @@
       - mattermost-data
     links:
       - "{{ DB_CONTAINER }}:db"
+  notify: enable websockets
 
