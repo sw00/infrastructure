@@ -35,6 +35,11 @@
         - DOMAIN: code.rigmarolesoup.com
           CONTAINER_NAME: gogs
           PROXY_PASS_PORT: 3000
+          HEADERS:
+            - "X-Frame-Options sameorigin"
+            - "X-Xss-Protection \"1; mode=block\""
+            - "X-Content-Type-Options nosniff"
+            - "Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-eval'; img-src 'self' data: https://secure.gravatar.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'\""
 
         - DOMAIN: chat.rigmarolesoup.com
           CONTAINER_NAME: mattermost

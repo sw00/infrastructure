@@ -31,11 +31,3 @@
   wait_for: path="/var/data/letsencrypt/live/{{ item.DOMAIN }}" timeout=5
   with_items: "{{ UPSTREAM_APPS }}"
 
-- name: template nginx conf files
-  template: dest="/var/data/nginx/{{ item.DOMAIN }}.conf" src=nginx.conf.j2
-  vars:
-    CONTAINER_NAME: "{{ item.CONTAINER_NAME }}"
-    PROXY_PASS_PORT: "{{ item.PROXY_PASS_PORT }}"
-  with_items: "{{ UPSTREAM_APPS }}"
-  notify: reload nginx
-
