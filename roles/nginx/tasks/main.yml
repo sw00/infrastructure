@@ -71,7 +71,7 @@
     loop_var: outer_item
 
 - name: check if dhparams exists
-  stat: path=/etc/letsencrypt/dhparams.pem
+  stat: path=/var/data/letsencrypt/dhparams.pem
   register: dhparams_result
 
 - name: generate dhparams
