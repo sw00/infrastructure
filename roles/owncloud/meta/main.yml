@@ -1,4 +1,0 @@
----
-dependencies:
-  - role: postgres
-    CONTAINER_NAME: "{{ DB_CONTAINER }}"

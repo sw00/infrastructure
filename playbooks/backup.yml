@@ -1,8 +1,0 @@
-- hosts: all
-  user: root
-  vars:
-    HOST_BACKUP_DIR: /var/backups/owncloud
-  tasks:
-    - name: backup owncloud
-      include: ../roles/owncloud/tasks/backup.yml
-

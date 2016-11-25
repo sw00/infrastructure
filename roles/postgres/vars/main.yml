@@ -1,4 +1,0 @@
----
-CONTAINER_NAME: postgres
-POSTGRES_USER: docker
-POSTGRES_PASSWORD: docker
